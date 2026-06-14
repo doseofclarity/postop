@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Postoperative Nursing | Comprehensive Review | Perioperative Care</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+        .recall-mode .reveal-text {
+            background-color: #cbd5e1;
+            color: transparent;
+            border-radius: 0.375rem;
+            padding: 0 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: inset 0 0 0 1px #94a3b8;
+        }
+        .recall-mode .reveal-text:hover,
+        .recall-mode .reveal-text.revealed {
+            background-color: #fef08a;
+            color: #1e293b;
+            box-shadow: none;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #0f766e; border-radius: 8px; }
+        .content-section { animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .quiz-feedback-correct { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .quiz-feedback-wrong { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+        .locked-section { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+        .flashcard { background: #fff; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: pointer; border: 1px solid #e2e8f0; }
+        .flashcard:hover { transform: translateY(-5px); }
+        .warning-box { background-color: #fee2e2; border-left: 6px solid #dc2626; padding: 1rem; border-radius: 0.75rem; margin: 1rem 0; }
+        .highlight { background-color: #fef9c3; padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-weight: bold; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { postop: { light: '#ccfbf1', DEFAULT: '#0f766e', dark: '#115e59' } } } }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col md:flex-row font-sans text-slate-800 overflow-hidden">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-postop-dark text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+        <button onclick="toggleMobileMenu()" class="text-white focus:outline-none z-40">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+        <h1 class="font-bold text-lg absolute left-1/2 transform -translate-x-1/2 pointer-events-none">
+            <i class="fa-solid fa-hospital-user mr-2"></i> Postop Nursing
+        </h1>
+        <div class="w-8"></div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-80 bg-white shadow-2xl h-full absolute md:relative z-30 transition-transform duration-300 shrink-0 border-r border-slate-200">
+        <div class="p-6 bg-gradient-to-br from-postop-dark to-postop text-white hidden md:block shrink-0">
+            <h1 class="font-black text-2xl tracking-wide"><i class="fa-regular fa-hand-peace mr-2"></i> Postoperative Nursing</h1>
+            <p class="text-sm text-teal-200 mt-1 font-medium">Recovery · Complications · Pain Management · Discharge</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 text-sm font-medium">
+                <li><button onclick="showSection('home')" id="btn-home" class="nav-btn w-full text-left px-6 py-3 bg-postop-light text-postop-dark border-r-4 border-postop-dark transition-colors"><i class="fa-solid fa-house w-6 nav-icon"></i> Home / Start</button></li>
+                <li><button onclick="showSection('phases')" id="btn-phases" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-chart-line w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Recovery Phases (PACU, Intermediate, Extended)</button></li>
+                <li><button onclick="showSection('assessment')" id="btn-assessment" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-stethoscope w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Immediate Postop Assessment (ABCDE)</button></li>
+                <li><button onclick="showSection('interventions')" id="btn-interventions" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-hand-holding-medical w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Nursing Interventions & Monitoring</button></li>
+                <li><button onclick="showSection('complications')" id="btn-complications" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-triangle-exclamation w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Early & Late Complications</button></li>
+                <li><button onclick="showSection('pain')" id="btn-pain" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-tablets w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Pain Management (Pharmacologic & Non-Pharmacologic)</button></li>
+                <li><button onclick="showSection('discharge')" id="btn-discharge" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-person-walking-arrow-right w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Discharge Planning & Teaching</button></li>
+                <li><button onclick="showSection('flashcards')" id="btn-flashcards" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors border-t border-slate-200 mt-2 locked-section"><i class="fa-solid fa-cards w-6 text-postop nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Flashcards & Mnemonics</button></li>
+                <li><button onclick="showSection('final_quiz_sec')" id="btn-final_quiz_sec" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-graduation-cap w-6 text-amber-500 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Final 50‑Item Exam</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 h-full overflow-y-auto bg-slate-100 relative w-full">
+        <div class="fixed top-16 md:top-4 right-4 md:right-8 z-40 flex items-center bg-white/90 backdrop-blur px-4 py-3 rounded-full shadow-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors" onclick="toggleRecallMode()">
+            <span class="mr-3 text-sm font-bold text-slate-700 hidden md:inline"><i class="fa-solid fa-brain text-postop mr-1"></i> Active Recall</span>
+            <button id="recall-toggle" class="w-12 h-6 bg-slate-300 rounded-full relative transition-colors duration-300 focus:outline-none shadow-inner pointer-events-none">
+                <div id="recall-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow"></div>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+            <!-- HOME SECTION -->
+            <section id="home" class="content-section flex flex-col items-center justify-center min-h-[80vh] text-center block">
+                <div class="bg-gradient-to-br from-slate-800 to-postop-dark text-white rounded-3xl shadow-2xl p-10 md:p-16 w-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white opacity-5 pointer-events-none"><i class="fa-solid fa-bed-pulse text-[20rem]"></i></div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 backdrop-blur-sm inline-block p-4 rounded-full text-teal-300 mb-6 shadow-sm border border-white/20">
+                            <i class="fa-solid fa-notes-medical text-5xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-300 mb-2 uppercase tracking-widest">Perioperative Nursing Series</h3>
+                        <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight drop-shadow-md">Postoperative Nursing</h1>
+                        <div class="bg-white/10 backdrop-blur inline-block px-6 py-3 rounded-full mb-10 border border-white/20">
+                            <p class="text-lg text-white font-medium">PACU care · Complications · Pain management · Discharge teaching | AORN / ASPAN Standards</p>
+                        </div>
+                        <button onclick="unlockFirstSection()" class="bg-slate-600 hover:bg-slate-500 text-white font-black py-4 px-10 rounded-full shadow-xl transition-transform hover:scale-105 text-lg flex items-center mx-auto focus:outline-none">
+                            Begin Module <i class="fa-solid fa-arrow-right ml-3"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 1. RECOVERY PHASES -->
+            <section id="phases" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-postop pb-3"><i class="fa-solid fa-chart-line text-postop mr-4"></i> Phases of Postoperative Recovery</h2>
+                    <div class="grid md:grid-cols-3 gap-5">
+                        <div class="bg-red-50 p-4 rounded-xl"><strong>🛏️ Phase I (PACU / Immediate)</strong><br><span class="reveal-text">• From transfer from OR until stable vital signs, awake, responsive.<br>• Focus: airway, breathing, circulation, pain, temperature, surgical site.<br>• Duration: typically 1‑4 hours.<br>• Aldrete score used for discharge to Phase II.</span></div>
+                        <div class="bg-amber-50 p-4 rounded-xl"><strong>🏥 Phase II (Intermediate / Step‑down)</strong><br><span class="reveal-text">• Patient is awake, stable, but still requires monitoring.<br>• Focus: ambulation, oral intake, pain control, wound care, education.<br>• Discharge to home or inpatient unit.</span></div>
+                        <div class="bg-green-50 p-4 rounded-xl"><strong>🏡 Phase III (Extended / Home)</strong><br><span class="reveal-text">• Ongoing recovery after hospital discharge.<br>• Focus: self‑care, medication management, follow‑up appointments, activity restrictions.<br>• Nurse role: discharge teaching, phone follow‑up.</span></div>
+                    </div>
+                    <canvas id="phaseChart" width="400" height="200" style="max-width:100%; margin-top:1rem;"></canvas>
+                    <div class="warning-box mt-4"><strong>⚠️ Critical Phase I priorities:</strong> <span class="reveal-text">Maintain patent airway, prevent hypoventilation, monitor for hemorrhage, manage pain, prevent hypothermia.</span></div>
+                    <button onclick="openQuiz('phases')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 2. IMMEDIATE POSTOP ASSESSMENT (ABCDE + more) -->
+            <section id="assessment" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-postop pb-3"><i class="fa-solid fa-stethoscope text-postop mr-4"></i> Immediate Postoperative Assessment (ABCDE & Aldrete)</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div><strong>🌬️ Airway & Breathing</strong><br><span class="reveal-text">• Patency, artificial airway, breath sounds, SpO2, respiratory rate/depth.<br>• Signs of obstruction: stridor, gurgling, absent breath sounds.</span><br><strong>❤️ Circulation</strong><br><span class="reveal-text">• Vital signs q15min, capillary refill, urine output, bleeding (drains, dressings).<br>• Watch for hypotension, tachycardia → hypovolemia or hemorrhage.</span></div>
+                        <div><strong>🧠 Disability (Neuro)</strong><br><span class="reveal-text">• Level of consciousness, pupil response, motor strength.<br>• Emergence delirium, sedation score (RASS).</span><br><strong>🌡️ Exposure & Environment</strong><br><span class="reveal-text">• Temperature (prevent hypothermia), wound inspection, pain assessment (Numeric scale, FLACC).<br>• Nausea/vomiting, surgical drains, IV lines.</span></div>
+                    </div>
+                    <div class="bg-indigo-50 p-3 rounded-lg mt-4"><strong>📊 Aldrete Score (discharge from PACU):</strong> <span class="reveal-text">Activity, Respiration, Circulation, Consciousness, O2 saturation. Score ≥9 required for transfer.</span></div>
+                    <button onclick="openQuiz('assessment')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 3. NURSING INTERVENTIONS & MONITORING -->
+            <section id="interventions" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-postop pb-3"><i class="fa-solid fa-hand-holding-medical text-postop mr-4"></i> Postoperative Nursing Interventions</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Respiratory:</strong> <span class="reveal-text">Incentive spirometry q1‑2h, turn/cough/deep breathing, early ambulation. Monitor for atelectasis, pneumonia.</span></li>
+                        <li><strong>Cardiovascular:</strong> <span class="reveal-text">Monitor I&O, daily weight, assess for DVT (SCDs, anticoagulation). Prevent hypovolemia/fluid overload.</span></li>
+                        <li><strong>GI/GU:</strong> <span class="reveal-text">Auscultate bowel sounds, advance diet as tolerated, monitor for nausea, urinary retention (bladder scan, catheter if needed).</span></li>
+                        <li><strong>Wound care:</strong> <span class="reveal-text">Assess surgical site for redness, drainage, dehiscence. Maintain aseptic technique for dressing changes.</span></li>
+                        <li><strong>Safety:</strong> <span class="reveal-text">Fall precautions (sedation, weakness), call light within reach, side rails up, orient patient.</span></li>
+                    </ul>
+                    <div class="bg-teal-50 p-3 rounded-lg mt-4"><i class="fa-regular fa-clock"></i> <strong>Key mnemonic “P.O.S.T.”</strong> – Pain control, Oxygenation/airway, Surgical site, Thromboembolism prophylaxis.</div>
+                    <button onclick="openQuiz('interventions')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 4. EARLY & LATE COMPLICATIONS -->
+            <section id="complications" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-postop pb-3"><i class="fa-solid fa-triangle-exclamation text-postop mr-4"></i> Postoperative Complications</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div class="bg-red-50 p-4 rounded-xl"><strong>🚨 Early (<48 hours)</strong><br><span class="reveal-text">• Hemorrhage – tachycardia, hypotension, decreased Hct, bright red blood.<br>• Hypovolemic shock.<br>• Respiratory: atelectasis, aspiration, pulmonary edema.<br>• Urinary retention, paralytic ileus.<br>• Nausea/vomiting (PONV).<br>• Hypothermia, malignant hyperthermia.<br>• Emergence delirium.</span></div>
+                        <div class="bg-amber-50 p-4 rounded-xl"><strong>⚠️ Late (>48 hours to weeks)</strong><br><span class="reveal-text">• Wound infection – erythema, purulent drainage, fever.<br>• Dehiscence / evisceration – emergency!<br>• DVT / PE – calf pain, swelling, sudden dyspnea.<br>• Pneumonia.<br>• Sepsis.<br>• Pressure injury.<br>• Urinary tract infection.</span></div>
+                    </div>
+                    <div class="warning-box"><strong>🆘 Evisceration emergency action:</strong> <span class="reveal-text">Place patient supine with knees bent, cover exposed organs with sterile saline-soaked gauze, do not attempt to reinsert, notify surgeon stat, prepare for OR.</span></div>
+                    <button onclick="openQuiz('complications')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 5. PAIN MANAGEMENT -->
+            <section id="pain" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-postop pb-3"><i class="fa-solid fa-tablets text-postop mr-4"></i> Postoperative Pain Management</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div><strong>💊 Pharmacologic</strong><br><span class="reveal-text">• Opioids: morphine, hydromorphone, fentanyl (IV PCA).<br>• Non‑opioids: acetaminophen, NSAIDs (ketorolac, ibuprofen).<br>• Regional anesthesia: epidural, peripheral nerve blocks.<br>• Local anesthetics at incision site.<br>• Adjuvants: gabapentin, ketamine, lidocaine infusion.</span></div>
+                        <div><strong>🧘 Non‑Pharmacologic</strong><br><span class="reveal-text">• Positioning, splinting incision during cough.<br>• Cold therapy, relaxation, guided imagery.<br>• Music therapy, distraction.<br>• Early ambulation (reduces pain from gas/immobility).<br>• Acupuncture/TENS (adjunct).</span></div>
+                    </div>
+                    <div class="bg-purple-50 p-3 rounded-lg mt-4"><strong>📏 Pain assessment:</strong> <span class="reveal-text">Use numeric (0‑10) or behavioral (FLACC) scale. Reassess after intervention within 30‑60min. Goal ≤3/10.</span></div>
+                    <button onclick="openQuiz('pain')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 6. DISCHARGE PLANNING & TEACHING -->
+            <section id="discharge" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-postop pb-3"><i class="fa-solid fa-person-walking-arrow-right text-postop mr-4"></i> Discharge Planning & Teaching</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div class="bg-lime-50 p-4 rounded-xl"><strong>📋 Key discharge criteria</strong><br><span class="reveal-text">• Stable vital signs × 24h.<br>• Tolerating oral intake.<br>• Voiding spontaneously.<br>• Ambulating with minimal assistance.<br>• Pain controlled with oral meds.<br>• No active bleeding or infection.<br>• Family/caregiver available.</span></div>
+                        <div class="bg-lime-50 p-4 rounded-xl"><strong>🧾 Patient teaching topics</strong><br><span class="reveal-text">• Incision care: keep clean & dry, signs of infection.<br>• Activity restrictions: no heavy lifting, driving, stairs.<br>• Medications: dosage, side effects, pain regimen.<br>• Diet: advance as tolerated, fiber to prevent constipation.<br>• Follow‑up appointment date.<br>• When to call MD: fever >38°C, increased pain, bleeding, wound separation, shortness of breath.</span></div>
+                    </div>
+                    <button onclick="openQuiz('discharge')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- 7. FLASHCARDS & MNEMONICS -->
+            <section id="flashcards" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-postop pb-3"><i class="fa-solid fa-cards text-postop mr-4"></i> Flashcards & Mnemonics</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-postop">Q: Aldrete score components?</div><div class="flash-answer hidden mt-2">Activity, Respiration, Circulation, Consciousness, O2 saturation (score 0‑2 each, total ≥9 for PACU discharge).</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-postop">Q: Early signs of hemorrhage?</div><div class="flash-answer hidden mt-2">Tachycardia, hypotension, cool clammy skin, decreased urine output, increased drainage.</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-postop">Q: Nursing action for wound evisceration?</div><div class="flash-answer hidden mt-2">Cover with sterile saline‑soaked gauze, place patient supine with knees bent, notify surgeon, prepare for OR.</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-postop">Q: DVT prevention measures?</div><div class="flash-answer hidden mt-2">Early ambulation, SCDs, hydration, anticoagulants (heparin/enoxaparin), leg exercises.</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-postop">Q: Most common postoperative respiratory complication?</div><div class="flash-answer hidden mt-2">Atelectasis (prevent with incentive spirometry, turning, coughing).</div></div>
+                    </div>
+                    <div class="mt-6 bg-amber-50 p-4 rounded-xl"><strong>🧠 Mnemonics for recall</strong><br><span class="reveal-text">• <strong>“P.O.S.T.”</strong> – Pain, Oxygenation, Surgical site, Thromboembolism prevention.<br>• <strong>“ABCDE”</strong> – Airway, Breathing, Circulation, Disability, Exposure.<br>• <strong>“DEHISCENCE”</strong> – Danger (emergency), Elevate knees, Hypovolemia prevention, Immediate notification, Sterile saline dressing, Call surgeon, Evacuate to OR.<br>• <strong>“R.E.L.I.E.F.”</strong> – Respiratory support, Emotional support, Latex precautions, IV fluids, Early ambulation, Fall prevention.</span></div>
+                    <button onclick="openQuiz('flashcards')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Final Exam</button>
+                </div>
+            </section>
+
+            <!-- FINAL EXAM SECTION -->
+            <section id="final_quiz_sec" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center min-h-[60vh] flex flex-col justify-center items-center">
+                    <i class="fa-solid fa-graduation-cap text-8xl text-amber-500 mb-6"></i>
+                    <h2 class="text-4xl font-black text-slate-800 mb-4">Final 50‑Item Exam: Postoperative Nursing</h2>
+                    <p class="text-lg text-slate-600 mb-8 max-w-2xl">Covers recovery phases, ABCDE assessment, complications, pain management, discharge criteria, and mnemonics. Score ≥75% to pass.</p>
+                    <button onclick="openQuiz('final_quiz')" class="w-full max-w-md bg-slate-800 text-white font-black py-4 rounded-xl shadow-md text-xl">Start Final Exam</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeQuiz()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <h2 id="quiz-title" class="text-3xl font-black text-slate-800 mb-2"></h2>
+            <div id="quiz-questions-container" class="space-y-4 mt-4"></div>
+            <button id="quiz-submit-btn" onclick="submitQuiz()" class="mt-8 w-full bg-postop text-white font-bold py-4 rounded-xl shadow-lg">Submit Answers</button>
+            <div id="quiz-result-container" class="hidden mt-6 p-4 rounded-xl bg-slate-100"></div>
+        </div>
+    </div>
+
+    <script>
+        let unlockedSections = ['home'];
+        // QUIZZES (10 questions each)
+        const quizzes = {
+            phases: { title: "Quiz: Recovery Phases", next: "assessment", questions: [
+                { q: "Phase I recovery (PACU) focuses on:", options: ["Home discharge teaching", "Airway, breathing, circulation stability", "Long‑term rehab", "Incision closure"], ans: 1 },
+                { q: "Aldrete score of ≥9 is required for:", options: ["Transfer to Phase II", "ICU admission", "Discharge to home", "Start of anesthesia"], ans: 0 },
+                { q: "Which phase involves ambulation and oral intake?", options: ["Phase I", "Phase II", "Phase III", "Intraoperative"], ans: 1 },
+                { q: "Typical duration of Phase I PACU stay:", options: ["30 min", "1‑4 hours", "24 hours", "1 week"], ans: 1 },
+                { q: "Phase III focuses on:", options: ["Immediate postop monitoring", "Self‑care after discharge", "Surgical consent", "Anesthesia reversal"], ans: 1 },
+                { q: "Which is a priority during Phase I?", options: ["Discharge planning", "Maintaining patent airway", "Removing sutures", "Prescribing home meds"], ans: 1 },
+                { q: "The nurse should monitor for hypothermia in which phase?", options: ["Phase I", "Phase II", "Phase III", "Preop"], ans: 0 },
+                { q: "Aldrete score includes assessment of:", options: ["Pain level", "Activity, respiration, circulation, consciousness, SpO2", "Bowel sounds", "Wound appearance"], ans: 1 },
+                { q: "Phase II discharge to home requires:", options: ["Intubation", "Stable vitals, tolerating oral intake, voiding", "ICU level care", "Family not needed"], ans: 1 },
+                { q: "The most dangerous period for airway complications is:", options: ["Phase I", "Phase II", "Phase III", "Preop"], ans: 0 }
+            ]},
+            assessment: { title: "Quiz: Immediate Postop Assessment", next: "interventions", questions: [
+                { q: "In the ABCDE approach, 'A' stands for:", options: ["Airway", "Analgesia", "Antibiotics", "Activity"], ans: 0 },
+                { q: "Which finding indicates airway obstruction?", options: ["Stridor", "Bradycardia", "Warm skin", "Hypertension"], ans: 0 },
+                { q: "Normal respiratory rate after surgery:", options: ["<8/min", "12‑20/min", ">30/min", "Irregular"], ans: 1 },
+                { q: "Hypotension and tachycardia in PACU may indicate:", options: ["Pain only", "Hemorrhage or hypovolemia", "Malignant hyperthermia", "Urinary retention"], ans: 1 },
+                { q: "Aldrete score assesses O2 saturation as:", options: ["<90% 0 pt, 90‑94% 1 pt, ≥95% 2 pts", "Only yes/no", "Not included", "SpO2 >92% only"], ans: 0 },
+                { q: "Pain assessment in non‑verbal child uses:", options: ["FLACC scale", "Numeric scale", "Visual analog", "Verbal rating"], ans: 0 },
+                { q: "A patient emerging from anesthesia with agitation and confusion is likely:", options: ["Emergence delirium", "Stroke", "Hypoglycemia", "Seizure"], ans: 0 },
+                { q: "Which vital sign change suggests bleeding?", options: ["Bradycardia, hypertension", "Tachycardia, hypotension", "Fever, bradypnea", "Normal"], ans: 1 },
+                { q: "The nurse should inspect the surgical site for:", options: ["Drainage and bleeding", "Only color", "Hair growth", "Scar formation"], ans: 0 },
+                { q: "Which is a sign of adequate circulation?", options: ["Capillary refill <2 sec", "Urine output <0.5 mL/kg/hr", "Cold extremities", "Weak pulses"], ans: 0 }
+            ]},
+            interventions: { title: "Quiz: Nursing Interventions", next: "complications", questions: [
+                { q: "Incentive spirometry is used to prevent:", options: ["Atelectasis", "Hemorrhage", "DVT", "Wound infection"], ans: 0 },
+                { q: "Early ambulation reduces risk of:", options: ["Pneumonia and DVT", "Pain only", "Bleeding", "Urinary retention"], ans: 0 },
+                { q: "To prevent DVT, the nurse should apply:", options: ["Sequential compression devices", "Heating pad", "Tight stockings only", "Ice packs"], ans: 0 },
+                { q: "Bladder scan is indicated for:", options: ["Suspected urinary retention", "Pain management", "Wound infection", "Bowel obstruction"], ans: 0 },
+                { q: "Which intervention reduces postoperative nausea?", options: ["Administer ondansetron", "Encourage deep breathing only", "Restrict all fluids", "Keep NPO"], ans: 0 },
+                { q: "Wound dressing changes should be performed using:", options: ["Sterile technique", "Clean gloves only", "Bare hands", "Non‑sterile water"], ans: 0 },
+                { q: "Fall precautions include:", options: ["Side rails up, call light within reach", "Restrain patient", "Leave alone", "Dim lights"], ans: 0 },
+                { q: "To prevent pneumonia, nurse teaches:", options: ["Coughing and deep breathing", "Bed rest", "No oral care", "Restrict fluids"], ans: 0 },
+                { q: "The mnemonic P.O.S.T. stands for:", options: ["Pain, Oxygenation, Surgical site, Thromboembolism", "Position, Output, SCDs, Temperature", "Pressure, Opioids, Sutures, Tubes", "None"], ans: 0 },
+                { q: "Which diet is typical immediate post‑op?", options: ["Clear liquids then advance", "Regular solid food", "NPO for 7 days", "Full liquids for 24h"], ans: 0 }
+            ]},
+            complications: { title: "Quiz: Postoperative Complications", next: "pain", questions: [
+                { q: "Most common early respiratory complication:", options: ["Pulmonary embolism", "Atelectasis", "Pneumothorax", "ARDS"], ans: 1 },
+                { q: "Signs of wound infection include:", options: ["Erythema, purulent drainage, fever", "Serous drainage, no pain", "Wound edges approximated", "No swelling"], ans: 0 },
+                { q: "Emergency action for evisceration is:", options: ["Cover with sterile saline gauze, call surgeon", "Push organs back", "Apply dry gauze", "Place patient prone"], ans: 0 },
+                { q: "DVT signs include:", options: ["Calf pain, swelling, warmth", "Chest pain only", "Fever and cough", "Headache"], ans: 0 },
+                { q: "Which finding suggests pulmonary embolism?", options: ["Sudden dyspnea, chest pain, hypoxia", "Bradycardia", "Hypotension only", "Abdominal pain"], ans: 0 },
+                { q: "Paralytic ileus is characterized by:", options: ["Absent bowel sounds, abdominal distension", "Diarrhea", "Hyperactive bowel sounds", "Nausea only"], ans: 0 },
+                { q: "Hypovolemic shock from hemorrhage presents with:", options: ["Tachycardia, hypotension, cool skin", "Bradycardia, hypertension", "Warm dry skin", "Normal urine output"], ans: 0 },
+                { q: "Late complication (>48h) includes:", options: ["Malignant hyperthermia", "Wound dehiscence", "Emergence delirium", "Anaphylaxis"], ans: 1 },
+                { q: "Nursing intervention for atelectasis:", options: ["Incentive spirometry, positioning", "Increase opioids", "Decrease fluids", "Bed rest"], ans: 0 },
+                { q: "Urinary retention management:", options: ["Bladder scan, catheter PRN", "Restrict fluids", "Encourage diuretics", "None"], ans: 0 }
+            ]},
+            pain: { title: "Quiz: Pain Management", next: "discharge", questions: [
+                { q: "First‑line opioid for moderate‑severe pain:", options: ["Morphine IV", "Acetaminophen", "Ibuprofen", "Aspirin"], ans: 0 },
+                { q: "Patient‑controlled analgesia (PCA) advantage:", options: ["Patient controls dosing, steady analgesic level", "Nurse controlled only", "Risk of overdose high", "Only oral"], ans: 0 },
+                { q: "Non‑pharmacologic pain intervention:", options: ["Guided imagery, splinting incision", "Fentanyl", "Ketorolac", "Epidural"], ans: 0 },
+                { q: "Adjuvant medication for neuropathic pain:", options: ["Gabapentin", "Morphine", "Ondansetron", "Lorazepam"], ans: 0 },
+                { q: "Pain reassessment after intervention should occur within:", options: ["30‑60 minutes", "2 hours", "12 hours", "Next day"], ans: 0 },
+                { q: "Which NSAID is commonly used post‑op?", options: ["Ketorolac", "Warfarin", "Heparin", "Clopidogrel"], ans: 0 },
+                { q: "Epidural analgesia complication to monitor:", options: ["Respiratory depression, hypotension", "Hypertension", "Fever", "Bradycardia"], ans: 0 },
+                { q: "Non‑opioid analgesic safe for most patients:", options: ["Acetaminophen", "Morphine", "Hydromorphone", "Fentanyl"], ans: 0 },
+                { q: "Splinting incision during coughing helps:", options: ["Reduce pain and support wound", "Increase pain", "Cause dehiscence", "No effect"], ans: 0 },
+                { q: "Pain goal after intervention:", options: ["≤3/10 or patient acceptable level", "0/10", "5/10", "No goal"], ans: 0 }
+            ]},
+            discharge: { title: "Quiz: Discharge Planning", next: "flashcards", questions: [
+                { q: "Which criteria indicate readiness for discharge?", options: ["Stable vitals, tolerating PO, voiding, pain controlled", "Fever present", "Unable to ambulate", "NPO"], ans: 0 },
+                { q: "Patient teaching includes signs of infection:", options: ["Fever, increased redness, purulent drainage", "Mild discomfort", "Serous drainage", "Bruising"], ans: 0 },
+                { q: "When to call the surgeon after discharge?", options: ["Fever >38°C, wound separation, shortness of breath", "Mild nausea", "Fatigue", "Constipation"], ans: 0 },
+                { q: "Activity restriction typically includes:", options: ["No heavy lifting for 4‑6 weeks", "Bed rest for 2 months", "Immediate full activity", "No restrictions"], ans: 0 },
+                { q: "Follow‑up appointment should be scheduled:", options: ["Before discharge", "Only if complications", "Patient's responsibility only", "After 3 months"], ans: 0 },
+                { q: "Which diet instruction is correct?", options: ["Increase fiber to prevent constipation", "Clear liquids only for 2 weeks", "No fluids", "High fat diet"], ans: 0 },
+                { q: "Medication teaching includes:", options: ["Dose, frequency, side effects, warnings", "Take all pills at once", "Share with family", "Stop if pain improves"], ans: 0 },
+                { q: "Incision care instructions:", options: ["Keep clean and dry, report signs of infection", "Apply alcohol daily", "Cover with wet gauze", "No shower for 1 month"], ans: 0 },
+                { q: "Which patient statement indicates understanding?", options: ["I will call if I have fever or increased pain", "I can drive tomorrow", "I don't need follow‑up", "I'll remove staples myself"], ans: 0 },
+                { q: "Discharge teaching priority for opioid prescription:", options: ["Risk of constipation, sedation, safe storage", "Take with alcohol", "Double dose if pain", "No need for stool softener"], ans: 0 }
+            ]},
+            flashcards: { title: "Quiz: Flashcards & Mnemonics", next: "final_quiz_sec", questions: [
+                { q: "Mnemonic for postoperative priorities P.O.S.T. stands for?", options: ["Pain, Oxygenation, Surgical site, Thromboembolism", "Pressure, Output, Suture, Temperature", "Position, Opioids, SCDs, Teaching", "None"], ans: 0 },
+                { q: "Aldrete score components?", options: ["Activity, Respiration, Circulation, Consciousness, SpO2", "Airway, Breathing, Capillary refill, Level of consciousness, Pain", "Temperature, Heart rate, BP, Urine output, Pain"], ans: 0 },
+                { q: "In evisceration, the nurse should immediately:", options: ["Apply sterile saline soaked gauze and call surgeon", "Push organs back", "Place patient flat", "Irrigate wound"], ans: 0 },
+                { q: "Early complication after surgery includes:", options: ["Hemorrhage", "Wound dehiscence", "Seroma", "Infection after 1 week"], ans: 0 },
+                { q: "Best intervention to prevent DVT:", options: ["Early ambulation, SCDs, anticoagulants", "Bed rest", "Massage calves", "Heat packs"], ans: 0 },
+                { q: "Which finding is a red flag after discharge?", options: ["Shortness of breath", "Mild incisional pain", "Slight swelling", "Constipation"], ans: 0 },
+                { q: "PCA education includes:", options: ["Patient only pushes button, not family", "Family can push if sleeping", "Maximum dose every 5 min", "No monitoring needed"], ans: 0 },
+                { q: "FLACC scale is used for:", options: ["Children or nonverbal patients", "Adults only", "Elderly with dementia", "All patients"], ans: 0 },
+                { q: "The most common postoperative infection site:", options: ["Surgical site", "Urinary tract", "Lungs", "Bloodstream"], ans: 0 },
+                { q: "Mnemonic for emergency evisceration management:", options: ["DEHISCENCE", "ABCDE", "PQRST", "COLDSPA"], ans: 0 }
+            ]}
+        };
+        // Build final 50-item exam (mix)
+        let finalQ = [];
+        for(let sec of ['phases','assessment','interventions','complications','pain','discharge','flashcards']) {
+            finalQ.push(...quizzes[sec].questions.slice(0,6));
+        }
+        while(finalQ.length < 50) finalQ.push({ q: "The single most important intervention to reduce postoperative pulmonary complications is:", options: ["Incentive spirometry and early ambulation", "Antibiotics", "Opioid analgesia", "Bed rest"], ans: 0 });
+        quizzes.final_quiz = { title: "Final 50‑Item Exam: Postoperative Nursing", next: null, questions: finalQ };
+
+        let phaseChart = null;
+        function initCharts() {
+            const ctx = document.getElementById('phaseChart')?.getContext('2d');
+            if(ctx && !phaseChart) {
+                phaseChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: ['Phase I (PACU)', 'Phase II (Step-down)', 'Phase III (Home)'], datasets: [{ label: 'Nursing intensity', data: [90, 60, 20], borderColor: '#0f766e', fill: false, tension: 0.3 }] },
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        }
+        function toggleFlash(el) { el.querySelector('.flash-answer')?.classList.toggle('hidden'); }
+        function unlockFirstSection() { if(!unlockedSections.includes('phases')) { unlockedSections.push('phases'); updateSidebarUI(); } showSection('phases'); }
+        function showSection(sectionId) {
+            if (!unlockedSections.includes(sectionId) && sectionId !== 'home') { alert("Complete the quiz at the bottom of the previous section to unlock."); return; }
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(sectionId)?.classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-postop-light','text-postop-dark','border-r-4','border-postop-dark'));
+            const activeBtn = document.getElementById('btn-'+sectionId);
+            if(activeBtn) activeBtn.classList.add('bg-postop-light','text-postop-dark','border-r-4','border-postop-dark');
+            if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+            if(sectionId === 'phases' && !phaseChart) setTimeout(initCharts, 50);
+        }
+        function updateSidebarUI() {
+            const sections = ['home','phases','assessment','interventions','complications','pain','discharge','flashcards','final_quiz_sec'];
+            sections.forEach(sec => {
+                const btn = document.getElementById('btn-'+sec);
+                if(!btn) return;
+                const lock = btn.querySelector('.fa-lock'), icon = btn.querySelector('.nav-icon');
+                if(unlockedSections.includes(sec) || sec==='home') { btn.classList.remove('locked-section'); if(lock) lock.classList.add('hidden'); if(icon) icon.classList.remove('hidden'); }
+                else { btn.classList.add('locked-section'); if(lock) lock.classList.remove('hidden'); if(icon) icon.classList.add('hidden'); }
+            });
+        }
+        let currentQuiz = null;
+        function openQuiz(sectionId) { currentQuiz = sectionId; const qd = quizzes[sectionId]; if(!qd) return; document.getElementById('quiz-title').innerHTML = qd.title; const container = document.getElementById('quiz-questions-container'); container.innerHTML = ''; qd.questions.forEach((q, idx) => { let html = `<div class="bg-slate-50 p-4 rounded-xl mb-4"><p class="font-bold mb-3">${idx+1}. ${q.q}</p><div class="space-y-2">`; q.options.forEach((opt,oi) => { html += `<label class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white cursor-pointer"><input type="radio" name="q${idx}" value="${oi}" class="form-radio text-postop"><span>${opt}</span></label>`; }); html += `</div><div class="feedback-${idx} text-sm mt-2 hidden"></div></div>`; container.innerHTML += html; }); document.getElementById('quiz-submit-btn').classList.remove('hidden'); document.getElementById('quiz-result-container').classList.add('hidden'); document.getElementById('quiz-modal').classList.remove('hidden'); }
+        function closeQuiz() { document.getElementById('quiz-modal').classList.add('hidden'); }
+        function submitQuiz() {
+            const qd = quizzes[currentQuiz];
+            if(!qd) return;
+            let score = 0;
+            for(let i=0; i<qd.questions.length; i++) {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                if(sel && parseInt(sel.value)===qd.questions[i].ans) score++;
+                const fbDiv = document.querySelector(`.feedback-${i}`);
+                if(fbDiv){
+                    fbDiv.classList.remove('hidden');
+                    const correctTxt = qd.questions[i].options[qd.questions[i].ans];
+                    if(sel && parseInt(sel.value)===qd.questions[i].ans) { fbDiv.innerHTML='<span class="text-green-700">✓ Correct</span>'; fbDiv.parentElement?.classList.add('quiz-feedback-correct'); }
+                    else { const selectedTxt = sel? qd.questions[i].options[parseInt(sel.value)]:"No answer"; fbDiv.innerHTML=`<span class="text-red-700">✗ Incorrect. Correct: ${correctTxt}. You answered: ${selectedTxt}</span>`; fbDiv.parentElement?.classList.add('quiz-feedback-wrong'); }
+                }
+            }
+            let percent = (score/qd.questions.length)*100;
+            let resultDiv = document.getElementById('quiz-result-container');
+            document.getElementById('quiz-submit-btn').classList.add('hidden');
+            resultDiv.classList.remove('hidden');
+            if(percent>=75){
+                if(currentQuiz==='final_quiz'){ resultDiv.innerHTML=`<div class="text-green-600 text-4xl text-center">🎉 Mastery! Score ${score}/${qd.questions.length} (${percent}%)<br>Excellent knowledge of Postoperative Nursing</div><button onclick="closeQuiz()" class="mt-4 bg-postop text-white px-6 py-2 rounded-xl">Close</button>`; return; }
+                if(quizzes[currentQuiz].next && !unlockedSections.includes(quizzes[currentQuiz].next)) unlockedSections.push(quizzes[currentQuiz].next);
+                if(quizzes[currentQuiz].next === 'flashcards' && !unlockedSections.includes('final_quiz_sec')) unlockedSections.push('final_quiz_sec');
+                updateSidebarUI();
+                resultDiv.innerHTML=`<div class="text-green-600 text-3xl text-center">✅ Passed! (${score}/${qd.questions.length})</div><button onclick="closeQuiz(); showSection('${quizzes[currentQuiz].next}')" class="mt-4 bg-green-600 text-white px-6 py-2 rounded-xl">Unlock Next Section</button>`;
+            } else { resultDiv.innerHTML=`<div class="text-red-600 text-3xl text-center">❌ Failed: ${score}/${qd.questions.length} (${percent}%)<br>Need 75%</div><button onclick="openQuiz('${currentQuiz}')" class="mt-4 bg-slate-600 text-white px-6 py-2 rounded-xl">Try Again</button>`; }
+        }
+        function toggleRecallMode() { const active = !document.body.classList.contains('recall-mode'); const toggle=document.getElementById('recall-toggle'),knob=document.getElementById('recall-knob'); if(active){ document.body.classList.add('recall-mode'); toggle.classList.add('bg-postop-dark'); knob.classList.add('translate-x-6'); } else { document.body.classList.remove('recall-mode'); toggle.classList.remove('bg-postop-dark'); knob.classList.remove('translate-x-6'); } }
+        function toggleMobileMenu() { const s=document.getElementById('sidebar'); if(s.classList.contains('hidden')) s.classList.remove('hidden','flex','absolute','h-full','z-50'); else s.classList.add('hidden'); }
+        document.addEventListener('DOMContentLoaded', () => { updateSidebarUI(); document.querySelectorAll('.reveal-text').forEach(el => el.addEventListener('click', function(){ if(document.body.classList.contains('recall-mode')) this.classList.toggle('revealed'); })); });
+    </script>
+</body>
+</html>
